@@ -1,0 +1,5 @@
+[package]
+
+name = "UTF8Reader"
+version = "0.0.1"
+authors = ["John Hodge <tpg@mutabah.net>"]
