@@ -10,3 +10,6 @@ for codepoint in reader.map(|cp| cp.unwrap())
 	print!("{}", codepoint);
 }
 ```
+
+=== Licencing ===
+This code is distributed under the terms of the zlib licence (see COPYING).
