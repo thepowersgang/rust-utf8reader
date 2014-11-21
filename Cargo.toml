@@ -1,5 +1,7 @@
 [package]
 
 name = "utf8reader"
-version = "0.0.1"
+version = "0.0.2"
+description = "Provides a wrapper around Reader that returns a stream of UTF-8 characters"
+license = "Zlib"
 authors = ["John Hodge <tpg@mutabah.net>"]
