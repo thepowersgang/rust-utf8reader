@@ -12,6 +12,15 @@ static BADCHAR: char = '\uFFFD';
 pub struct UTF8Reader<T: Reader>
 {
 	stream: T,
+}	
+
+fn tochar(codepoint: u32) -> char
+{
+	match ::std::char::from_u32(codepoint)
+	{
+	Some(c) => c,
+	None => BADCHAR,
+	}
 }
 
 impl<T:Reader> UTF8Reader<T>
@@ -27,59 +36,59 @@ impl<T:Reader> UTF8Reader<T>
 	/// On an encoding error, it returns '\uFFFD' (the unicode replacement character)
 	pub fn getc(&mut self) -> IoResult<char>
 	{
-		let ch1 = try!(self.stream.read_byte());
+		let ch1 = try!(self.stream.read_byte()) as u32;
 		if ch1 & 0xC0 == 0x80 {
 			return Ok( BADCHAR )
 		}
 		if ch1 & 0x80 == 0x00
 		{
 			// Single-byte
-			Ok(ch1 as char)
+			Ok( tochar(ch1) )
 		}
 		else if ch1 & 0xE0 == 0xC0
 		{
 			// Two-byte sequence
-			let ch2 = try!(self.stream.read_byte());
+			let ch2 = try!(self.stream.read_byte()) as u32;
 			if ch2 & 0xC0 != 0x80 {
 				return Ok( BADCHAR );
 			}
 			
 			let ret = (ch1 & 0x1F << 6) | (ch2 & 0x3F << 0);
-			Ok( ret as char )
+			Ok( tochar(ret) )
 		}
 		else if ch1 & 0xF0 == 0xE0
 		{
 			// Three-byte sequence
-			let ch2 = try!(self.stream.read_byte());
+			let ch2 = try!(self.stream.read_byte()) as u32;
 			if ch2 & 0xC0 != 0x80 {
 				return Ok( BADCHAR );
 			}
-			let ch3 = try!(self.stream.read_byte());
+			let ch3 = try!(self.stream.read_byte()) as u32;
 			if ch3 & 0xC0 != 0x80 {
 				return Ok( BADCHAR );
 			}
 			
 			let ret = (ch1 & 0x0F << 12) | (ch2 & 0x3F << 6) | (ch3 & 0x3F << 0);
-			Ok( ret as char )
+			Ok( tochar(ret) )
 		}
 		else if ch1 & 0xF8 == 0xF0
 		{
 			// Four-byte sequence
-			let ch2 = try!(self.stream.read_byte());
+			let ch2 = try!(self.stream.read_byte()) as u32;
 			if ch2 & 0xC0 != 0x80 {
 				return Ok( BADCHAR );
 			}
-			let ch3 = try!(self.stream.read_byte());
+			let ch3 = try!(self.stream.read_byte()) as u32;
 			if ch3 & 0xC0 != 0x80 {
 				return Ok( BADCHAR );
 			}
-			let ch4 = try!(self.stream.read_byte());
+			let ch4 = try!(self.stream.read_byte()) as u32;
 			if ch4 & 0xC0 != 0x80 {
 				return Ok( BADCHAR );
 			}
 			
 			let ret = (ch1 & 0x07 << 18) | (ch2 & 0x3F << 12) | (ch3 & 0x3F << 6) | (ch4 & 0x3F << 0);
-			Ok( ret as char )
+			Ok( tochar(ret) )
 		}
 		else
 		{
