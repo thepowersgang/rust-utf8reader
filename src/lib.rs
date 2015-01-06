@@ -3,10 +3,11 @@
 //
 // 
 // Reads a stream of UTF-8 encoded codepoints from a "Reader"
+#![feature(associated_types)]
 use std::io::IoResult;
 
 /// Unicode replacement character
-static BADCHAR: char = '\uFFFD';
+static BADCHAR: char = '\u{FFFD}';
 
 /// UTF8 reader structure
 pub struct UTF8Reader<T: Reader>
@@ -99,8 +100,9 @@ impl<T:Reader> UTF8Reader<T>
 }
 
 /// Implmentation of the same interface as 'Chars' provides, returns None at the end of the stream
-impl<T:Reader> Iterator<IoResult<char>> for UTF8Reader<T>
+impl<T:Reader> Iterator for UTF8Reader<T>
 {
+	type Item = IoResult<char>;
 	fn next(&mut self) -> Option<IoResult<char>>
 	{
 		// Get result from decoder
